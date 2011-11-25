@@ -38,6 +38,6 @@ INSTALLED_APPS = (
     'django.contrib.admin',
     #'debug_toolbar',
     #'django_extensions',
-    #'south',
+    'south',
     'fortunecookie',
 )
