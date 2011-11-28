@@ -19,9 +19,9 @@ setup(
     packages=find_packages(exclude=['test_project']),
     include_package_data=True,
     zip_safe=False,
-    install_requires=['Django>=1.3'],
+    install_requires=['Django>=1.3', 'django-sortedm2m>=0.3.3'],
     setup_requires=[],
-    tests_require=['Django>=1.3', 'South>=0.7.3', 'django-setuptest'],
+    tests_require=['Django>=1.3', 'South>=0.7.3', 'django-sortedm2m>=0.3.3', 'django-setuptest'],
     test_suite='setuptest.SetupTestSuite',
     classifiers=[
         'Development Status :: 1 - Planning',

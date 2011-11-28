@@ -1,6 +1,9 @@
 # Django
 from django.db import models
 
+# Django-SortedM2M
+from sortedm2m.fields import SortedManyToManyField
+
 class BaseModel(models.Model):
     """Base model class to track created and modified timestamps."""
 
@@ -21,6 +24,10 @@ class LuckyNumber(BaseModel):
     def __unicode__(self):
         return u'%d' % self.number
 
+    def __int__(self):
+        return self.number
+
+    @property
     def occurrences(self):
         return self.fortune_cookies.count()
 
@@ -48,31 +55,11 @@ class ChineseWord(BaseModel):
     )
 
     def __unicode__(self):
-        return u'%s == %s' % (self.english_word, self.pinyin_word or '?')
+        return u'%s <==> %s' % (self.english_word, self.pinyin_word or '?')
 
+    @property
     def occurrences(self):
         return self.fortune_cookies.count()
-
-class FortuneCookieLuckyNumber(BaseModel):
-    """Through table for relation between fortune cookies and lucky numbers."""
-
-    class Meta:
-        unique_together = ('fortune_cookie', 'lucky_number')
-        order_with_respect_to = 'fortune_cookie'
-        ordering = ['order', 'lucky_number']
-
-    fortune_cookie = models.ForeignKey(
-        'FortuneCookie',
-        related_name='fortune_cookie_lucky_numbers'
-    )
-    lucky_number = models.ForeignKey(
-        'LuckyNumber',
-        related_name='fortune_cookie_lucky_numbers'
-    )
-    order = models.IntegerField(default=0)
-
-    def __unicode__(self):
-        return unicode(self.lucky_number)
 
 class FortuneCookie(BaseModel):
     """Fortune cookie: 29 cents; what a bargain!"""
@@ -90,14 +77,33 @@ class FortuneCookie(BaseModel):
         blank=True,
         null=True,
         default=None,
+        on_delete=models.PROTECT,
         help_text='Learn Chinese.'
     )
-    lucky_numbers = models.ManyToManyField(
+    lucky_numbers = SortedManyToManyField(
         'LuckyNumber',
-        through='FortuneCookieLuckyNumber',
         related_name='fortune_cookies',
         help_text='Lucky numbers.'
     )
+
+    def __init__(self, *args, **kwargs):
+        self._init_lucky_numbers = kwargs.pop('lucky_numbers', None)
+        super(FortuneCookie, self).__init__(*args, **kwargs)
+
+    def save(self, *args, **kwargs):
+        #if isinstance(self.chinese_word, basestring):
+        #    self.chinese_word = ChineseWord.objects.get_or_create(english_word=self.chinese_word)
+        #elif isinstance(self.chinese_word, (tuple, list)) and len(self.chinese_word):
+        #    d = dict(zip(['english_word', 'pinyin_word', 'chinese_word'], self.chinese_word))
+        #    self.chinese_word = ChineseWord.objects.get_or_create(**d)
+        if not self.pk and self._init_lucky_numbers and isinstance(self._init_lucky_numbers, (list, tuple)):
+            lucky_numbers = self._init_lucky_numbers
+        else:
+            lucky_numbers = []
+        super(FortuneCookie, self).save(*args, **kwargs)
+        for order, number in enumerate(lucky_numbers):
+            lucky_number = LuckyNumber.objects.get_or_create(number=int(number))[0]
+            FortuneCookieLuckyNumber.objects.create(fortune_cookie=self, lucky_number=lucky_number, order=order)
 
     def lucky_numbers_display(self):
         return u', '.join(map(unicode, self.lucky_numbers.all()))

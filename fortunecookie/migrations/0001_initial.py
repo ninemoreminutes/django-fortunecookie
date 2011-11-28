@@ -32,19 +32,6 @@ class Migration(SchemaMigration):
         ))
         db.send_create_signal('fortunecookie', ['ChineseWord'])
 
-        # Adding model 'FortuneCookieLuckyNumber'
-        db.create_table('fortunecookie_fortunecookieluckynumber', (
-            ('basemodel_ptr', self.gf('django.db.models.fields.related.OneToOneField')(to=orm['fortunecookie.BaseModel'], unique=True, primary_key=True)),
-            ('fortune_cookie', self.gf('django.db.models.fields.related.ForeignKey')(related_name='fortune_cookie_lucky_numbers', to=orm['fortunecookie.FortuneCookie'])),
-            ('lucky_number', self.gf('django.db.models.fields.related.ForeignKey')(related_name='fortune_cookie_lucky_numbers', to=orm['fortunecookie.LuckyNumber'])),
-            ('order', self.gf('django.db.models.fields.IntegerField')(default=0)),
-            ('_order', self.gf('django.db.models.fields.IntegerField')(default=0)),
-        ))
-        db.send_create_signal('fortunecookie', ['FortuneCookieLuckyNumber'])
-
-        # Adding unique constraint on 'FortuneCookieLuckyNumber', fields ['fortune_cookie', 'lucky_number']
-        db.create_unique('fortunecookie_fortunecookieluckynumber', ['fortune_cookie_id', 'lucky_number_id'])
-
         # Adding model 'FortuneCookie'
         db.create_table('fortunecookie_fortunecookie', (
             ('basemodel_ptr', self.gf('django.db.models.fields.related.OneToOneField')(to=orm['fortunecookie.BaseModel'], unique=True, primary_key=True)),
@@ -53,12 +40,18 @@ class Migration(SchemaMigration):
         ))
         db.send_create_signal('fortunecookie', ['FortuneCookie'])
 
+        # Adding SortedM2M table for field lucky_numbers on 'FortuneCookie'
+        db.create_table('fortunecookie_fortunecookie_lucky_numbers', (
+            ('id', models.AutoField(verbose_name='ID', primary_key=True, auto_created=True)),
+            ('fortunecookie', models.ForeignKey(orm['fortunecookie.fortunecookie'], null=False)),
+            ('luckynumber', models.ForeignKey(orm['fortunecookie.luckynumber'], null=False)),
+            ('sort_value', models.IntegerField())
+        ))
+        db.create_unique('fortunecookie_fortunecookie_lucky_numbers', ['fortunecookie_id', 'luckynumber_id'])
+
 
     def backwards(self, orm):
         
-        # Removing unique constraint on 'FortuneCookieLuckyNumber', fields ['fortune_cookie', 'lucky_number']
-        db.delete_unique('fortunecookie_fortunecookieluckynumber', ['fortune_cookie_id', 'lucky_number_id'])
-
         # Deleting model 'BaseModel'
         db.delete_table('fortunecookie_basemodel')
 
@@ -68,11 +61,11 @@ class Migration(SchemaMigration):
         # Deleting model 'ChineseWord'
         db.delete_table('fortunecookie_chineseword')
 
-        # Deleting model 'FortuneCookieLuckyNumber'
-        db.delete_table('fortunecookie_fortunecookieluckynumber')
-
         # Deleting model 'FortuneCookie'
         db.delete_table('fortunecookie_fortunecookie')
+
+        # Removing M2M table for field lucky_numbers on 'FortuneCookie'
+        db.delete_table('fortunecookie_fortunecookie_lucky_numbers')
 
 
     models = {
@@ -94,15 +87,7 @@ class Migration(SchemaMigration):
             'basemodel_ptr': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['fortunecookie.BaseModel']", 'unique': 'True', 'primary_key': 'True'}),
             'chinese_word': ('django.db.models.fields.related.ForeignKey', [], {'default': 'None', 'related_name': "'fortune_cookies'", 'null': 'True', 'blank': 'True', 'to': "orm['fortunecookie.ChineseWord']"}),
             'fortune': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
-            'lucky_numbers': ('django.db.models.fields.related.ManyToManyField', [], {'related_name': "'fortune_cookies'", 'symmetrical': 'False', 'through': "orm['fortunecookie.FortuneCookieLuckyNumber']", 'to': "orm['fortunecookie.LuckyNumber']"})
-        },
-        'fortunecookie.fortunecookieluckynumber': {
-            'Meta': {'ordering': "('_order',)", 'unique_together': "(('fortune_cookie', 'lucky_number'),)", 'object_name': 'FortuneCookieLuckyNumber', '_ormbases': ['fortunecookie.BaseModel']},
-            '_order': ('django.db.models.fields.IntegerField', [], {'default': '0'}),
-            'basemodel_ptr': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['fortunecookie.BaseModel']", 'unique': 'True', 'primary_key': 'True'}),
-            'fortune_cookie': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'fortune_cookie_lucky_numbers'", 'to': "orm['fortunecookie.FortuneCookie']"}),
-            'lucky_number': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'fortune_cookie_lucky_numbers'", 'to': "orm['fortunecookie.LuckyNumber']"}),
-            'order': ('django.db.models.fields.IntegerField', [], {'default': '0'})
+            'lucky_numbers': ('sortedm2m.fields.SortedManyToManyField', [], {'related_name': "'fortune_cookies'", 'symmetrical': 'False', 'to': "orm['fortunecookie.LuckyNumber']"})
         },
         'fortunecookie.luckynumber': {
             'Meta': {'ordering': "['number']", 'object_name': 'LuckyNumber', '_ormbases': ['fortunecookie.BaseModel']},

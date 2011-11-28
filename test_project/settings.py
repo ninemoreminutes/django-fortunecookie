@@ -26,6 +26,12 @@ DATABASES = {
 
 SITE_ID = 1
 
+STATIC_URL = '/static/'
+
+MIDDLEWARE_CLASSES += (
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
+)
+
 ROOT_URLCONF = 'test_project.urls'
 
 INSTALLED_APPS = (
@@ -34,10 +40,16 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.sites',
     'django.contrib.messages',
-    #'django.contrib.staticfiles',
+    'django.contrib.staticfiles',
     'django.contrib.admin',
-    #'debug_toolbar',
-    #'django_extensions',
+    'debug_toolbar',
     'south',
+    'sortedm2m',
     'fortunecookie',
 )
+
+INTERNAL_IPS = ('127.0.0.1',)
+
+DEBUG_TOOLBAR_CONFIG = {
+    'INTERCEPT_REDIRECTS': False,
+}
