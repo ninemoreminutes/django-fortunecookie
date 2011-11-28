@@ -36,7 +36,7 @@ setup(
     tests_require=['Django>=1.3', 'South>=0.7.3', 'django-sortedm2m==0.3.3', 'django-setuptest'],
     test_suite='test_project.TestSuite',
     classifiers=[
-        'Development Status :: 1 - Planning',
+        'Development Status :: 3 - Alpha',
         'Environment :: Web Environment',
         'Framework :: Django',
         'Intended Audience :: Developers',
