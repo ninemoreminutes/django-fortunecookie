@@ -32,6 +32,10 @@ MIDDLEWARE_CLASSES += (
     'debug_toolbar.middleware.DebugToolbarMiddleware',
 )
 
+TEMPLATE_DIRS = (
+    os.path.join(PROJECT_ROOT, 'templates'),
+)
+
 ROOT_URLCONF = 'test_project.urls'
 
 INSTALLED_APPS = (

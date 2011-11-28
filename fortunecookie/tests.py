@@ -42,18 +42,44 @@ class TestFortuneCookie(TestCase):
         self.assertEqual(cw3.chinese_word, '')
 
     def test_fortune_cookie(self):
+        ln1 = LuckyNumber.objects.create(number=95)
+        ln2 = LuckyNumber.objects.create(number=32)
         self.assertEqual(FortuneCookie.objects.count(), 0)
-        fc1, created = FortuneCookie.objects.get_or_create(fortune='test')
-        self.assertTrue(created)
+        fc1 = FortuneCookie.objects.create(fortune='test')
         self.assertEqual(fc1.fortune, 'test')
         self.assertEqual(fc1.chinese_word, None)
         self.assertEqual(fc1.lucky_numbers.count(), 0)
-        
-        #fc2 = FortuneCookie.objects.create(fortune='test', lucky_numbers=(3,5,7))
-        #fc2a = FortuneCookie.objects.get(pk=fc2.pk)
+        fc1.lucky_numbers.add(ln1)
+        self.assertEqual(fc1.lucky_numbers.count(), 1)
+        self.assertEqual(fc1.lucky_numbers.all()[0].number, ln1.number)
+        fc1.lucky_numbers.add(ln2)
+        self.assertEqual(fc1.lucky_numbers.count(), 2)
+        self.assertEqual(fc1.lucky_numbers.all()[0].number, ln1.number)
+        self.assertEqual(fc1.lucky_numbers.all()[1].number, ln2.number)
+        fc2 = FortuneCookie.objects.create(fortune='test', lucky_numbers=(3,5,7))
+        self.assertNotEqual(fc2.pk, fc1.pk)
+        self.assertEqual(fc2.fortune, 'test')
+        self.assertEqual(fc2.chinese_word, None)
+        self.assertEqual(fc2.lucky_numbers.count(), 3)
+        self.assertEqual([x.number for x in fc2.lucky_numbers.all()], [3,5,7])
+        fc2.lucky_numbers.remove(5)
+        self.assertEqual([x.number for x in fc2.lucky_numbers.all()], [3,7])
+        fc2.lucky_numbers.add(ln2)
+        self.assertEqual([x.number for x in fc2.lucky_numbers.all()], [3,7,32])
+        fc2.lucky_numbers.create(number=2)
+        self.assertEqual([x.number for x in fc2.lucky_numbers.all()], [3,7,32,2])
+        fc2.lucky_numbers.clear()
+        self.assertEqual([x.number for x in fc2.lucky_numbers.all()], [])
 
-    def test_protected_deletes(self):
-        pass
+    def test_protected_delete(self):
+        cw1 = ChineseWord.objects.create(english_word='dog')
+        fc1 = FortuneCookie.objects.create(fortune='test', chinese_word=cw1)
+        self.assertEqual(fc1.chinese_word.pk, cw1.pk)
+        self.assertRaises(models.ProtectedError, cw1.delete)
+        fc1.delete()
+        self.assertEqual(ChineseWord.objects.count(), 1)
+        cw1.delete()
+        self.assertEqual(ChineseWord.objects.count(), 0)
 
     def test_fixture(self):
-        pass
+        pass # FIXME

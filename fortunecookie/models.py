@@ -7,6 +7,9 @@ from sortedm2m.fields import SortedManyToManyField
 class BaseModel(models.Model):
     """Base model class to track created and modified timestamps."""
 
+    class Meta:
+        abstract = True
+
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
 
@@ -101,9 +104,9 @@ class FortuneCookie(BaseModel):
         else:
             lucky_numbers = []
         super(FortuneCookie, self).save(*args, **kwargs)
-        for order, number in enumerate(lucky_numbers):
+        for number in lucky_numbers:
             lucky_number = LuckyNumber.objects.get_or_create(number=int(number))[0]
-            FortuneCookieLuckyNumber.objects.create(fortune_cookie=self, lucky_number=lucky_number, order=order)
+            self.lucky_numbers.add(lucky_number)
 
     def lucky_numbers_display(self):
         return u', '.join(map(unicode, self.lucky_numbers.all()))

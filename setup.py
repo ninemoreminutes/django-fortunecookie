@@ -1,10 +1,22 @@
 #!/usr/bin/env python
 
+# Python
+import sys
+
 # Setuptools
 from setuptools import setup, find_packages
 
 # Django-FortuneCookie
 from fortunecookie import __VERSION__
+
+# FIXME: This app needs my patched version of django-sortedm2m to work:
+# git://github.com/ninemoreminutes/django-sortedm2m.git@d5a5e29820147e55d971ff6dc2cf73b1897c8ec1
+try:
+    import sortedm2m
+    assert sortedm2m.__version__ == (0, 3, 3)
+except (ImportError, AssertionError):
+    print >> sys.stderr, 'django-sortedm2m==0.3.3 is required (install from github)'
+    sys.exit(1)
 
 setup(
     name='django-fortunecookie',
@@ -19,10 +31,10 @@ setup(
     packages=find_packages(exclude=['test_project']),
     include_package_data=True,
     zip_safe=False,
-    install_requires=['Django>=1.3', 'django-sortedm2m>=0.3.3'],
+    install_requires=['Django>=1.3', 'django-sortedm2m==0.3.3'],
     setup_requires=[],
-    tests_require=['Django>=1.3', 'South>=0.7.3', 'django-sortedm2m>=0.3.3', 'django-setuptest'],
-    test_suite='setuptest.SetupTestSuite',
+    tests_require=['Django>=1.3', 'South>=0.7.3', 'django-sortedm2m==0.3.3', 'django-setuptest'],
+    test_suite='test_project.TestSuite',
     classifiers=[
         'Development Status :: 1 - Planning',
         'Environment :: Web Environment',
