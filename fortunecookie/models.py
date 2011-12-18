@@ -13,11 +13,19 @@ class BaseModel(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
 
+class LuckyNumberManager(models.Manager):
+    """Manager for the lucky number model."""
+    
+    def get_by_natural_key(self, number):
+        return self.get(number=number)
+
 class LuckyNumber(BaseModel):
     """Unique lucky numbers from the fortune cookies."""
 
     class Meta:
         ordering = ['number']
+
+    objects = LuckyNumberManager()
 
     number = models.IntegerField(
         primary_key=True,
@@ -30,15 +38,27 @@ class LuckyNumber(BaseModel):
     def __int__(self):
         return self.number
 
+    def natural_key(self):
+        return (self.number,)
+
     @property
     def occurrences(self):
         return self.fortune_cookies.count()
+
+class ChineseWordManager(models.Manager):
+    """Manager for the Chinese word model."""
+
+    def get_by_natural_key(self, english_word, pinyin_word):
+        return self.get(english_word=english_word, pinyin_word=pinyin_word)
 
 class ChineseWord(BaseModel):
     """English and Chinese translations of the 'Learn Chinese' word."""
 
     class Meta:
+        unique_together = ('english_word', 'pinyin_word')
         ordering = ['english_word']
+
+    objects = ChineseWordManager()
 
     english_word = models.CharField(
         max_length=64,
@@ -58,7 +78,15 @@ class ChineseWord(BaseModel):
     )
 
     def __unicode__(self):
-        return u'%s <==> %s' % (self.english_word, self.pinyin_word or '?')
+        if self.pinyin_word and self.chinese_word:
+            return u'%s: %s (%s)' % (self.english_word, self.chinese_word, self.pinyin_word)
+        elif self.chinese_word:
+            return u'%s: %s' % (self.english_word, self.chinese_word)
+        else:
+            return u'%s: %s' % (self.english_word, self.pinyin_word or '?')
+
+    def natural_key(self):
+        return (self.english_word, self.pinyin_word)
 
     @property
     def occurrences(self):
