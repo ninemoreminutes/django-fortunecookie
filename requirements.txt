@@ -1,12 +1,18 @@
 # PIP Requirements (for a development/build environment)
-coverage==3.5.1
-docutils==0.8.1
-Django==1.3.1
-django-debug-toolbar==0.8.5
-django-setuptest==0.0.6
--e git://github.com/ninemoreminutes/django-sortedm2m.git@d5a5e29820147e55d971ff6dc2cf73b1897c8ec1#egg=django_sortedm2m
+argparse==1.2.1
+coverage==3.6b1
+docutils==0.9.1
+Django==1.4.2
+django-debug-toolbar==0.9.4
+django-devserver==0.4.0
+django-extensions==1.0.1
+https://github.com/gregmuellegger/django-setuptest/tarball/master#egg=django-setuptest
+django_sortedm2m==0.4.0
 Jinja2==2.6
-pep8==0.6.1
-Pygments==1.4
-South==0.7.3
-Sphinx==1.1.2
+pep8==1.3.3
+py==1.4.12
+Pygments==1.5
+South==0.7.6
+Sphinx==1.1.3
+tox==1.4.2
+virtualenv==1.8.4

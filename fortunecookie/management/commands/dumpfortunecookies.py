@@ -1,10 +1,10 @@
 # Python
-import json
 from optparse import make_option
 
 # Django
 from django.core.management.base import BaseCommand, CommandError
 from django.core import serializers
+from django.utils import simplejson
 
 class Command(BaseCommand):
 
@@ -42,12 +42,18 @@ class Command(BaseCommand):
         try:
             json_data = serializers.serialize('json', objects, indent=indent,
                                               use_natural_keys=use_natural_keys)
-            serialized_objects = json.loads(json_data)
+            serialized_objects = simplejson.loads(json_data)
             for obj in serialized_objects:
                 if 'fields' in obj:
-                    obj['fields'].pop('created')
-                    obj['fields'].pop('modified')
-            return json.dumps(serialized_objects, indent=indent)
+                    # Replace Django 1.4 created/modified timestamps with a
+                    # format compatible with Django 1.3.
+                    for field in ('created', 'modified'):
+                        if field in obj['fields']:
+                            value = obj['fields'][field]
+                            value = value.replace('T', ' ')
+                            value = value[:value.find('.')]
+                            obj['fields'][field] = value
+            return simplejson.dumps(serialized_objects, indent=indent)
         except Exception, e:
             if show_traceback:
                 raise

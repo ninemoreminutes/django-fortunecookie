@@ -7,20 +7,11 @@ import sys
 from setuptools import setup, find_packages
 
 # Django-FortuneCookie
-from fortunecookie import __VERSION__
-
-# FIXME: This app needs my patched version of django-sortedm2m to work:
-# git://github.com/ninemoreminutes/django-sortedm2m.git@d5a5e29820147e55d971ff6dc2cf73b1897c8ec1
-try:
-    import sortedm2m
-    assert sortedm2m.__version__ == (0, 3, 3)
-except (ImportError, AssertionError):
-    print >> sys.stderr, 'django-sortedm2m==0.3.3 is required (install from github)'
-    sys.exit(1)
+from fortunecookie import __version__
 
 setup(
     name='django-fortunecookie',
-    version=__VERSION__,
+    version=__version__,
     author='Nine More Minutes, Inc.',
     author_email='support@ninemoreminutes.com',
     description='Django models to store everything about fortune cookies.',
@@ -31,10 +22,22 @@ setup(
     packages=find_packages(exclude=['test_project']),
     include_package_data=True,
     zip_safe=False,
-    install_requires=['Django>=1.3', 'django-sortedm2m==0.3.3'],
+    install_requires=[
+        'Django>=1.3',
+        'django-sortedm2m>=0.4.0',
+    ],
     setup_requires=[],
-    tests_require=['Django>=1.3', 'South>=0.7.3', 'django-sortedm2m==0.3.3', 'django-setuptest'],
-    test_suite='test_project.TestSuite',
+    tests_require=[
+        'argparse',
+        'Django',
+        'django-debug-toolbar',
+        'django-devserver',
+        'django-extensions',
+        'django-sortedm2m',
+        #'django-setuptest',
+        'South',
+    ],
+    test_suite='test_suite.TestSuite',
     classifiers=[
         'Development Status :: 3 - Alpha',
         'Environment :: Web Environment',
@@ -55,8 +58,8 @@ setup(
             'source_dir': 'docs',
             'build_dir': 'docs/_build',
             'all_files': True,
-            'version': __VERSION__,
-            'release': __VERSION__,
+            'version': __version__,
+            'release': __version__,
         },
         'upload_sphinx': {
             'upload_dir': 'docs/_build/html',

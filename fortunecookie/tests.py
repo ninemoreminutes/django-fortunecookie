@@ -1,5 +1,11 @@
+# Python
+import StringIO
+import sys
+import tempfile
+
 # Django
 from django.test import TestCase
+from django.core.management import call_command
 
 # Django-FortuneCookie
 from fortunecookie.models import *
@@ -82,4 +88,32 @@ class TestFortuneCookie(TestCase):
         self.assertEqual(ChineseWord.objects.count(), 0)
 
     def test_fixture(self):
-        pass # FIXME
+        self.assertEqual(FortuneCookie.objects.count(), 0)
+        self.assertEqual(LuckyNumber.objects.count(), 0)
+        self.assertEqual(ChineseWord.objects.count(), 0)
+        call_command('loaddata', 'fortunecookies.json')
+        self.assertEqual(FortuneCookie.objects.count(), 13)
+        self.assertEqual(LuckyNumber.objects.count(), 99)
+        self.assertEqual(ChineseWord.objects.count(), 6)
+        json_data = ''
+        stdout = sys.stdout
+        try:
+            sys.stdout = StringIO.StringIO()
+            call_command('dumpfortunecookies')
+            json_data = sys.stdout.getvalue()
+        finally:
+            sys.stdout = stdout
+        self.assertTrue(json_data)
+        tf = tempfile.NamedTemporaryFile(suffix='.json')
+        tf.write(json_data)
+        tf.flush()
+        FortuneCookie.objects.all().delete()
+        LuckyNumber.objects.all().delete()
+        ChineseWord.objects.all().delete()
+        self.assertEqual(FortuneCookie.objects.count(), 0)
+        self.assertEqual(LuckyNumber.objects.count(), 0)
+        self.assertEqual(ChineseWord.objects.count(), 0)
+        call_command('loaddata', tf.name)
+        self.assertEqual(FortuneCookie.objects.count(), 13)
+        self.assertEqual(LuckyNumber.objects.count(), 99)
+        self.assertEqual(ChineseWord.objects.count(), 6)
