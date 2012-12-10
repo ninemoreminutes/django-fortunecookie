@@ -1,0 +1,8 @@
+# PIP Requirements (for test site on DreamHost)
+Django==1.4.2
+django-debug-toolbar==0.9.4
+django-devserver==0.4.0
+django-extensions==1.0.1
+django_sortedm2m==0.4.0
+South==0.7.6
+-e svn+https://projects.ninemoreminutes.com/svn/django-fortunecookie/trunk#egg=django-fortunecookie
