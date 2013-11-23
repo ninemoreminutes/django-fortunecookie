@@ -1,1 +1,3 @@
+recursive-include fortunecookie *.py *.json
+include LICENSE
 include README

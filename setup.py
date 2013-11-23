@@ -34,7 +34,7 @@ setup(
     license='BSD',
     keywords='django fortune cookie',
     url='https://projects.ninemoreminutes.com/projects/django-fortunecookie/',
-    packages=find_packages(exclude=['test_project']),
+    packages=['fortunecookie'],
     include_package_data=True,
     zip_safe=False,
     install_requires=[
