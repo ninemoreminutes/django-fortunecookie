@@ -4,6 +4,7 @@ from django.db import models
 # Django-SortedM2M
 from sortedm2m.fields import SortedManyToManyField
 
+
 class BaseModel(models.Model):
     """Base model class to track created and modified timestamps."""
 
@@ -13,11 +14,13 @@ class BaseModel(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
 
+
 class LuckyNumberManager(models.Manager):
     """Manager for the lucky number model."""
-    
+
     def get_by_natural_key(self, number):
         return self.get(number=number)
+
 
 class LuckyNumber(BaseModel):
     """Unique lucky numbers from the fortune cookies."""
@@ -45,11 +48,13 @@ class LuckyNumber(BaseModel):
     def occurrences(self):
         return self.fortune_cookies.count()
 
+
 class ChineseWordManager(models.Manager):
     """Manager for the Chinese word model."""
 
     def get_by_natural_key(self, english_word, pinyin_word):
         return self.get(english_word=english_word, pinyin_word=pinyin_word)
+
 
 class ChineseWord(BaseModel):
     """English and Chinese translations of the 'Learn Chinese' word."""
@@ -79,7 +84,8 @@ class ChineseWord(BaseModel):
 
     def __unicode__(self):
         if self.pinyin_word and self.chinese_word:
-            return u'%s: %s (%s)' % (self.english_word, self.chinese_word, self.pinyin_word)
+            return u'%s: %s (%s)' % (self.english_word, self.chinese_word,
+                                     self.pinyin_word)
         elif self.chinese_word:
             return u'%s: %s' % (self.english_word, self.chinese_word)
         else:
@@ -91,6 +97,7 @@ class ChineseWord(BaseModel):
     @property
     def occurrences(self):
         return self.fortune_cookies.count()
+
 
 class FortuneCookie(BaseModel):
     """Fortune cookie: 29 cents; what a bargain!"""
@@ -123,18 +130,22 @@ class FortuneCookie(BaseModel):
 
     def save(self, *args, **kwargs):
         #if isinstance(self.chinese_word, basestring):
-        #    self.chinese_word = ChineseWord.objects.get_or_create(english_word=self.chinese_word)
-        #elif isinstance(self.chinese_word, (tuple, list)) and len(self.chinese_word):
-        #    d = dict(zip(['english_word', 'pinyin_word', 'chinese_word'], self.chinese_word))
+        #    self.chinese_word = \
+        #   ChineseWord.objects.get_or_create(english_word=self.chinese_word)
+        #elif isinstance(self.chinese_word, (tuple, list)) and \
+        #        len(self.chinese_word):
+        #    d = dict(zip(['english_word', 'pinyin_word', 'chinese_word'],
+        #             self.chinese_word))
         #    self.chinese_word = ChineseWord.objects.get_or_create(**d)
-        if not self.pk and self._init_lucky_numbers and isinstance(self._init_lucky_numbers, (list, tuple)):
+        if not self.pk and self._init_lucky_numbers and \
+                isinstance(self._init_lucky_numbers, (list, tuple)):
             lucky_numbers = self._init_lucky_numbers
         else:
             lucky_numbers = []
         super(FortuneCookie, self).save(*args, **kwargs)
         for number in lucky_numbers:
-            lucky_number = LuckyNumber.objects.get_or_create(number=int(number))[0]
-            self.lucky_numbers.add(lucky_number)
+            ln = LuckyNumber.objects.get_or_create(number=int(number))[0]
+            self.lucky_numbers.add(ln)
 
     def lucky_numbers_display(self):
         return u', '.join(map(unicode, self.lucky_numbers.all()))

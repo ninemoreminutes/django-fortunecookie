@@ -1,5 +1,3 @@
 The Django FortuneCookie library provides a reusable Django application with 
 model definitions to store everything about fortune cookies. It includes a test
 fixture to provide sample data for testing third-party apps.
-
-Initial model design and tests are complete.

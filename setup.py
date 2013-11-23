@@ -9,6 +9,21 @@ from setuptools import setup, find_packages
 # Django-FortuneCookie
 from fortunecookie import __version__
 
+tests_require=[
+    'Django',
+    #'django-debug-toolbar',
+    'django-devserver',
+    'django-extensions',
+    'django-sortedm2m',
+    'django-setuptest',
+    'South',
+],
+
+try:
+    import argparse
+except ImportError:
+    tests_require.append('argparse')
+
 setup(
     name='django-fortunecookie',
     version=__version__,
@@ -26,17 +41,8 @@ setup(
         'Django>=1.3',
         'django-sortedm2m>=0.4.0',
     ],
+    tests_require=tests_require,
     setup_requires=[],
-    tests_require=[
-        'argparse',
-        'Django',
-        'django-debug-toolbar',
-        'django-devserver',
-        'django-extensions',
-        'django-sortedm2m',
-        #'django-setuptest',
-        'South',
-    ],
     test_suite='test_suite.TestSuite',
     classifiers=[
         'Development Status :: 3 - Alpha',

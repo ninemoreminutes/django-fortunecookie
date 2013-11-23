@@ -10,6 +10,7 @@ from django.core.management import call_command
 # Django-FortuneCookie
 from fortunecookie.models import *
 
+
 class TestFortuneCookie(TestCase):
     """Test cases for Django-FortuneCookie app."""
 
@@ -62,18 +63,22 @@ class TestFortuneCookie(TestCase):
         self.assertEqual(fc1.lucky_numbers.count(), 2)
         self.assertEqual(fc1.lucky_numbers.all()[0].number, ln1.number)
         self.assertEqual(fc1.lucky_numbers.all()[1].number, ln2.number)
-        fc2 = FortuneCookie.objects.create(fortune='test', lucky_numbers=(3,5,7))
+        fc2 = FortuneCookie.objects.create(fortune='test',
+                                           lucky_numbers=(3, 5, 7))
         self.assertNotEqual(fc2.pk, fc1.pk)
         self.assertEqual(fc2.fortune, 'test')
         self.assertEqual(fc2.chinese_word, None)
         self.assertEqual(fc2.lucky_numbers.count(), 3)
-        self.assertEqual([x.number for x in fc2.lucky_numbers.all()], [3,5,7])
+        self.assertEqual([x.number for x in fc2.lucky_numbers.all()],
+                         [3, 5, 7])
         fc2.lucky_numbers.remove(5)
-        self.assertEqual([x.number for x in fc2.lucky_numbers.all()], [3,7])
+        self.assertEqual([x.number for x in fc2.lucky_numbers.all()], [3, 7])
         fc2.lucky_numbers.add(ln2)
-        self.assertEqual([x.number for x in fc2.lucky_numbers.all()], [3,7,32])
+        self.assertEqual([x.number for x in fc2.lucky_numbers.all()],
+                         [3, 7, 32])
         fc2.lucky_numbers.create(number=2)
-        self.assertEqual([x.number for x in fc2.lucky_numbers.all()], [3,7,32,2])
+        self.assertEqual([x.number for x in fc2.lucky_numbers.all()],
+                         [3, 7, 32, 2])
         fc2.lucky_numbers.clear()
         self.assertEqual([x.number for x in fc2.lucky_numbers.all()], [])
 

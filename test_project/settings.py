@@ -26,11 +26,12 @@ DATABASES = {
 
 SITE_ID = 1
 
+SECRET_KEY = '1a93a98e-03e7-4787-b099-0209705b80aa'
+
 STATIC_URL = '/static/'
 
 MIDDLEWARE_CLASSES += (
     'debug_toolbar.middleware.DebugToolbarMiddleware',
-    'devserver.middleware.DevServerMiddleware',
 )
 
 TEMPLATE_DIRS = (
@@ -63,3 +64,18 @@ DEBUG_TOOLBAR_CONFIG = {
 
 DEVSERVER_DEFAULT_ADDR = '127.0.0.1'
 DEVSERVER_DEFAULT_PORT = '8066'
+
+DEVSERVER_MODULES = (
+    #'devserver.modules.sql.SQLRealTimeModule',
+    'devserver.modules.sql.SQLSummaryModule',
+    'devserver.modules.profile.ProfileSummaryModule',
+    # Modules not enabled by default
+    #'devserver.modules.ajax.AjaxDumpModule',
+    #'devserver.modules.profile.MemoryUseModule',
+    #'devserver.modules.cache.CacheSummaryModule',
+    #'devserver.modules.profile.LineProfilerModule',
+)
+
+TEST_RUNNER = 'hotrunner.HotRunner'
+
+EXCLUDED_TEST_APPS = [x for x in INSTALLED_APPS if x != 'fortunecookie']

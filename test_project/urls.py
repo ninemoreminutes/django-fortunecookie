@@ -1,14 +1,16 @@
+# Django
 from django.conf import settings
-from django.conf.urls.defaults import patterns, include, url
+from django.conf.urls import patterns, include, url
+from django.views.generic import RedirectView
 
 urlpatterns = patterns('')
 
 if 'django.contrib.admin' in settings.INSTALLED_APPS:
     from django.contrib import admin
     admin.autodiscover()
-    urlpatterns += patterns('django.views.generic.simple',
-        url('^$', 'redirect_to', {'url': '/admin/'}),
-    )
+    #urlpatterns += patterns('',
+    #    url(r'^$', RedirectView.as_view(url='/admin/')),
+    #)
     urlpatterns += patterns('',
         url(r'^admin/', include(admin.site.urls)),
     )

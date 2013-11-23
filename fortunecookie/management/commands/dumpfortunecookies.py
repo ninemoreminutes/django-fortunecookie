@@ -6,16 +6,19 @@ from django.core.management.base import BaseCommand, CommandError
 from django.core import serializers
 from django.utils import simplejson
 
+
 class Command(BaseCommand):
 
     option_list = BaseCommand.option_list + (
         make_option('--indent', default=None, dest='indent', type='int',
-            help='Specifies the indent level to use when pretty-printing output'),
+                    help='Specifies the indent level to use when '
+                    'pretty-printing output'),
         make_option('-n', '--natural', action='store_true',
-            dest='use_natural_keys', default=True,
-            help='Use natural keys if they are available.'),
+                    dest='use_natural_keys', default=True, help='Use natural '
+                    'keys if they are available.'),
         make_option('--pks', action='store_true', dest='use_primary_keys',
-            default=False, help='Use integer primary keys instead of natural keys'),
+                    default=False, help='Use integer primary keys instead of '
+                    'natural keys'),
     )
     help = ('Perform a simple dump of fortune cookie models to generate '
             'the fortunecookies test fixture (JSON only for now).')
@@ -40,9 +43,9 @@ class Command(BaseCommand):
         for model in get_models(app):
             objects.extend(model._default_manager.all())
         try:
-            json_data = serializers.serialize('json', objects, indent=indent,
-                                              use_natural_keys=use_natural_keys)
-            serialized_objects = simplejson.loads(json_data)
+            jsondata = serializers.serialize('json', objects, indent=indent,
+                                             use_natural_keys=use_natural_keys)
+            serialized_objects = simplejson.loads(jsondata)
             for obj in serialized_objects:
                 if 'fields' in obj:
                     # Replace Django 1.4 created/modified timestamps with a
