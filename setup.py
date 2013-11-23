@@ -9,7 +9,7 @@ from setuptools import setup, find_packages
 # Django-FortuneCookie
 from fortunecookie import __version__
 
-tests_require=[
+tests_require = [
     'Django',
     #'django-debug-toolbar',
     'django-devserver',
@@ -17,7 +17,7 @@ tests_require=[
     'django-sortedm2m',
     'django-setuptest',
     'South',
-],
+]
 
 try:
     import argparse
