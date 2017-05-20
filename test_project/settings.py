@@ -3,6 +3,7 @@ import os
 import sys
 
 # Django
+import django
 from django.conf import global_settings
 
 # Update this module's local settings from the global settings module.
@@ -15,7 +16,6 @@ for setting in dir(global_settings):
 PROJECT_ROOT = os.path.abspath(os.path.dirname(__file__))
 
 DEBUG = True
-TEMPLATE_DEBUG = DEBUG
 
 DATABASES = {
     'default': {
@@ -30,13 +30,45 @@ SECRET_KEY = '1a93a98e-03e7-4787-b099-0209705b80aa'
 
 STATIC_URL = '/static/'
 
-MIDDLEWARE_CLASSES += (
-    'debug_toolbar.middleware.DebugToolbarMiddleware',
-)
+if django.VERSION >= (1, 10):
+    MIDDLEWARE = [
+        'django.middleware.security.SecurityMiddleware',
+        'django.contrib.sessions.middleware.SessionMiddleware',
+        'django.middleware.common.CommonMiddleware',
+        'django.middleware.csrf.CsrfViewMiddleware',
+        'django.contrib.auth.middleware.AuthenticationMiddleware',
+        'django.contrib.messages.middleware.MessageMiddleware',
+        'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    ]
+else:
+    MIDDLEWARE_CLASSES = [
+        'django.middleware.security.SecurityMiddleware',
+        'django.contrib.sessions.middleware.SessionMiddleware',
+        'django.middleware.common.CommonMiddleware',
+        'django.middleware.csrf.CsrfViewMiddleware',
+        'django.contrib.auth.middleware.AuthenticationMiddleware',
+        'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
+        'django.contrib.messages.middleware.MessageMiddleware',
+        'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    ]
 
-TEMPLATE_DIRS = (
-    os.path.join(PROJECT_ROOT, 'templates'),
-)
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'APP_DIRS': True,
+        'DIRS': [
+            os.path.join(PROJECT_ROOT, 'templates'),
+        ],
+        'OPTIONS': {
+            'context_processors': [
+                'django.template.context_processors.debug',
+                'django.template.context_processors.request',
+                'django.contrib.auth.context_processors.auth',
+                'django.contrib.messages.context_processors.messages',
+            ],
+        },
+    },
+]
 
 ROOT_URLCONF = 'test_project.urls'
 
@@ -48,34 +80,28 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.admin',
-    'debug_toolbar',
-    'devserver',
     'django_extensions',
-    'south',
     'sortedm2m',
     'fortunecookie',
+    'test_project.test_app',
 )
 
 INTERNAL_IPS = ('127.0.0.1',)
 
-DEBUG_TOOLBAR_CONFIG = {
-    'INTERCEPT_REDIRECTS': False,
-}
+try:
+    import debug_toolbar  # noqa
+    INSTALLED_APPS += ('debug_toolbar',)
+    if django.VERSION >= (1, 10):
+        MIDDLEWARE += ('debug_toolbar.middleware.DebugToolbarMiddleware',)
+    else:
+        MIDDLEWARE_CLASSES += ('debug_toolbar.middleware.DebugToolbarMiddleware',)
+    DEBUG_TOOLBAR_CONFIG = {
+        'INTERCEPT_REDIRECTS': False,
+    }
+except ImportError:
+    pass
 
-DEVSERVER_DEFAULT_ADDR = '127.0.0.1'
-DEVSERVER_DEFAULT_PORT = '8066'
-
-DEVSERVER_MODULES = (
-    #'devserver.modules.sql.SQLRealTimeModule',
-    'devserver.modules.sql.SQLSummaryModule',
-    'devserver.modules.profile.ProfileSummaryModule',
-    # Modules not enabled by default
-    #'devserver.modules.ajax.AjaxDumpModule',
-    #'devserver.modules.profile.MemoryUseModule',
-    #'devserver.modules.cache.CacheSummaryModule',
-    #'devserver.modules.profile.LineProfilerModule',
-)
-
-TEST_RUNNER = 'hotrunner.HotRunner'
+RUNSERVER_DEFAULT_ADDR = '127.0.0.1'
+RUNSERVER_DEFAULT_PORT = '8066'
 
 EXCLUDED_TEST_APPS = [x for x in INSTALLED_APPS if x != 'fortunecookie']

@@ -1,4 +1,7 @@
-from test_project.settings import *
+# Python
+import os
+
+from test_project.settings import *  # noqa
 
 DEBUG = False
 

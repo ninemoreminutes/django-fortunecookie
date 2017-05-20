@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ error_title }}{% endblock %}
+
+{% block bodyclass %}error{% endblock %}
+
+{% block main %}
+<div class="container">
+  <div class="row">
+    <div class="col-md-6 col-md-offset-3 col-sm-8 col-sm-offset-2 col-xs-12">
+      <br><br>
+      <div class="panel panel-default panel-danger">
+        <div class="panel-heading">
+          <h3 class="panel-title">{{ error_title }} ({{ error_status }})</h3>
+        </div>
+        <div class="panel-body">
+          {{ error_message }}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock main %}

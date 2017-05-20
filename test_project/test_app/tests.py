@@ -1,14 +1,17 @@
 # Python
-import StringIO
 import sys
 import tempfile
+
+# Six
+import six
 
 # Django
 from django.test import TestCase
 from django.core.management import call_command
+from django.db import models
 
 # Django-FortuneCookie
-from fortunecookie.models import *
+from fortunecookie.models import LuckyNumber, ChineseWord, FortuneCookie
 
 
 class TestFortuneCookie(TestCase):
@@ -21,6 +24,9 @@ class TestFortuneCookie(TestCase):
         self.assertEqual(LuckyNumber.objects.count(), 1)
         self.assertEqual(ln1.number, 99)
         self.assertEqual(ln1.pk, 99)
+        self.assertEqual(six.text_type(ln1), '99')
+        self.assertEqual(int(ln1), 99)
+        self.assertEqual(ln1.occurrences, 0)
         ln2, created = LuckyNumber.objects.get_or_create(number=99)
         self.assertFalse(created)
         self.assertEqual(ln2.pk, ln1.pk)
@@ -38,15 +44,25 @@ class TestFortuneCookie(TestCase):
         self.assertEqual(cw1.english_word, 'dog')
         self.assertEqual(cw1.pinyin_word, '')
         self.assertEqual(cw1.chinese_word, '')
+        self.assertEqual(six.text_type(cw1), u'dog: ?')
+        self.assertEqual(cw1.occurrences, 0)
         cw2, created = ChineseWord.objects.get_or_create(english_word='dog')
         self.assertFalse(created)
         self.assertEqual(cw2.pk, cw1.pk)
-        cw3, created = ChineseWord.objects.get_or_create(english_word='cat')
+        cw3, created = ChineseWord.objects.get_or_create(english_word='cat', pinyin_word=u'M\u0101o', chinese_word=u'\u732b')
         self.assertTrue(created)
         self.assertEqual(ChineseWord.objects.count(), 2)
         self.assertEqual(cw3.english_word, 'cat')
-        self.assertEqual(cw3.pinyin_word, '')
-        self.assertEqual(cw3.chinese_word, '')
+        self.assertEqual(cw3.pinyin_word, u'M\u0101o')
+        self.assertEqual(cw3.chinese_word, u'\u732b')
+        self.assertEqual(six.text_type(cw3), u'cat: \u732b (M\u0101o)')
+        cw4, created = ChineseWord.objects.get_or_create(english_word='fish', chinese_word=u'\u9c7c')
+        self.assertTrue(created)
+        self.assertEqual(ChineseWord.objects.count(), 3)
+        self.assertEqual(cw4.english_word, 'fish')
+        self.assertEqual(cw4.pinyin_word, '')
+        self.assertEqual(cw4.chinese_word, u'\u9c7c')
+        self.assertEqual(six.text_type(cw4), u'fish: \u9c7c')
 
     def test_fortune_cookie(self):
         ln1 = LuckyNumber.objects.create(number=95)
@@ -56,6 +72,7 @@ class TestFortuneCookie(TestCase):
         self.assertEqual(fc1.fortune, 'test')
         self.assertEqual(fc1.chinese_word, None)
         self.assertEqual(fc1.lucky_numbers.count(), 0)
+        self.assertEqual(six.text_type(fc1), u'test')
         fc1.lucky_numbers.add(ln1)
         self.assertEqual(fc1.lucky_numbers.count(), 1)
         self.assertEqual(fc1.lucky_numbers.all()[0].number, ln1.number)
@@ -69,6 +86,7 @@ class TestFortuneCookie(TestCase):
         self.assertEqual(fc2.fortune, 'test')
         self.assertEqual(fc2.chinese_word, None)
         self.assertEqual(fc2.lucky_numbers.count(), 3)
+        self.assertEqual(six.text_type(fc2), u'test (3, 5, 7)')
         self.assertEqual([x.number for x in fc2.lucky_numbers.all()],
                          [3, 5, 7])
         fc2.lucky_numbers.remove(5)
@@ -103,14 +121,15 @@ class TestFortuneCookie(TestCase):
         json_data = ''
         stdout = sys.stdout
         try:
-            sys.stdout = StringIO.StringIO()
-            call_command('dumpfortunecookies')
+            sys.stdout = six.StringIO()
+            call_command('dumpdata', 'fortunecookie', natural_foreign=True)
             json_data = sys.stdout.getvalue()
         finally:
             sys.stdout = stdout
         self.assertTrue(json_data)
         tf = tempfile.NamedTemporaryFile(suffix='.json')
-        tf.write(json_data)
+        json_data = json_data.encode('utf8')
+        tf.write(six.binary_type(json_data))
         tf.flush()
         FortuneCookie.objects.all().delete()
         LuckyNumber.objects.all().delete()
@@ -118,6 +137,10 @@ class TestFortuneCookie(TestCase):
         self.assertEqual(FortuneCookie.objects.count(), 0)
         self.assertEqual(LuckyNumber.objects.count(), 0)
         self.assertEqual(ChineseWord.objects.count(), 0)
+        call_command('loaddata', tf.name)
+        self.assertEqual(FortuneCookie.objects.count(), 13)
+        self.assertEqual(LuckyNumber.objects.count(), 99)
+        self.assertEqual(ChineseWord.objects.count(), 6)
         call_command('loaddata', tf.name)
         self.assertEqual(FortuneCookie.objects.count(), 13)
         self.assertEqual(LuckyNumber.objects.count(), 99)

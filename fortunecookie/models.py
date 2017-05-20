@@ -1,5 +1,13 @@
+# Python
+from __future__ import unicode_literals
+
+# Six
+import six
+
 # Django
 from django.db import models
+from django.utils.encoding import python_2_unicode_compatible
+from django.utils.translation import ugettext_lazy as _
 
 # Django-SortedM2M
 from sortedm2m.fields import SortedManyToManyField
@@ -22,6 +30,7 @@ class LuckyNumberManager(models.Manager):
         return self.get(number=number)
 
 
+@python_2_unicode_compatible
 class LuckyNumber(BaseModel):
     """Unique lucky numbers from the fortune cookies."""
 
@@ -32,10 +41,10 @@ class LuckyNumber(BaseModel):
 
     number = models.IntegerField(
         primary_key=True,
-        help_text='The lucky number.'
+        help_text=_('The lucky number.'),
     )
 
-    def __unicode__(self):
+    def __str__(self):
         return u'%d' % self.number
 
     def __int__(self):
@@ -56,6 +65,7 @@ class ChineseWordManager(models.Manager):
         return self.get(english_word=english_word, pinyin_word=pinyin_word)
 
 
+@python_2_unicode_compatible
 class ChineseWord(BaseModel):
     """English and Chinese translations of the 'Learn Chinese' word."""
 
@@ -67,22 +77,22 @@ class ChineseWord(BaseModel):
 
     english_word = models.CharField(
         max_length=64,
-        help_text='English version of the word.'
+        help_text=_('English version of the word.'),
     )
     pinyin_word = models.CharField(
         max_length=64,
         blank=True,
         default='',
-        help_text='Hanyu Pinyin representation of the word.'
+        help_text=_('Hanyu Pinyin representation of the word.'),
     )
     chinese_word = models.CharField(
         max_length=64,
         blank=True,
         default='',
-        help_text='Simplified Chinese representation of the word.'
+        help_text=_('Simplified Chinese representation of the word.'),
     )
 
-    def __unicode__(self):
+    def __str__(self):
         if self.pinyin_word and self.chinese_word:
             return u'%s: %s (%s)' % (self.english_word, self.chinese_word,
                                      self.pinyin_word)
@@ -99,6 +109,7 @@ class ChineseWord(BaseModel):
         return self.fortune_cookies.count()
 
 
+@python_2_unicode_compatible
 class FortuneCookie(BaseModel):
     """Fortune cookie: 29 cents; what a bargain!"""
 
@@ -107,7 +118,7 @@ class FortuneCookie(BaseModel):
 
     fortune = models.CharField(
         max_length=255,
-        help_text='Confucious say...'
+        help_text=_('Confucious say...'),
     )
     chinese_word = models.ForeignKey(
         'ChineseWord',
@@ -116,12 +127,12 @@ class FortuneCookie(BaseModel):
         null=True,
         default=None,
         on_delete=models.PROTECT,
-        help_text='Learn Chinese.'
+        help_text=_('Learn Chinese.'),
     )
     lucky_numbers = SortedManyToManyField(
         'LuckyNumber',
         related_name='fortune_cookies',
-        help_text='Lucky numbers.'
+        help_text=_('Lucky numbers.'),
     )
 
     def __init__(self, *args, **kwargs):
@@ -129,10 +140,10 @@ class FortuneCookie(BaseModel):
         super(FortuneCookie, self).__init__(*args, **kwargs)
 
     def save(self, *args, **kwargs):
-        #if isinstance(self.chinese_word, basestring):
+        # if isinstance(self.chinese_word, basestring):
         #    self.chinese_word = \
         #   ChineseWord.objects.get_or_create(english_word=self.chinese_word)
-        #elif isinstance(self.chinese_word, (tuple, list)) and \
+        # elif isinstance(self.chinese_word, (tuple, list)) and \
         #        len(self.chinese_word):
         #    d = dict(zip(['english_word', 'pinyin_word', 'chinese_word'],
         #             self.chinese_word))
@@ -148,10 +159,10 @@ class FortuneCookie(BaseModel):
             self.lucky_numbers.add(ln)
 
     def lucky_numbers_display(self):
-        return u', '.join(map(unicode, self.lucky_numbers.all()))
+        return u', '.join(map(six.text_type, self.lucky_numbers.all()))
     lucky_numbers_display.short_description = 'Lucky numbers'
 
-    def __unicode__(self):
+    def __str__(self):
         if self.lucky_numbers.count():
             return u'%s (%s)' % (self.fortune, self.lucky_numbers_display())
         else:

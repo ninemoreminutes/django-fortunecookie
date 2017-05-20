@@ -2,7 +2,7 @@
 from django.contrib import admin
 
 # Django-FortuneCookie
-from models import *
+from fortunecookie.models import LuckyNumber, ChineseWord, FortuneCookie
 
 
 class LuckyNumberAdmin(admin.ModelAdmin):

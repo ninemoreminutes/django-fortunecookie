@@ -1,0 +1,6 @@
+django
+django-debug-toolbar
+django-sortedm2m
+ipython
+sphinx
+tox
