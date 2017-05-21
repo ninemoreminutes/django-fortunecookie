@@ -61,7 +61,6 @@ setup(
     ],
     options={
         'egg_info': {
-            'tag_svn_revision': 0,
             'tag_build': '.dev',
         },
         'build_sphinx': {
@@ -79,7 +78,7 @@ setup(
         },
         'aliases': {
             'dev_build': 'egg_info sdist build_sphinx',
-            'release_build': 'egg_info -b "" -R sdist build_sphinx',
+            'release_build': 'egg_info -b "" sdist build_sphinx',
             'test': 'pytest',
         },
     },
