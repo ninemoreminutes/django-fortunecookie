@@ -12,6 +12,9 @@ from django.utils.translation import ugettext_lazy as _
 # Django-SortedM2M
 from sortedm2m.fields import SortedManyToManyField
 
+# Django-FortuneCookie
+from fortunecookie.managers import LuckyNumberManager, ChineseWordManager
+
 
 class BaseModel(models.Model):
     """Base model class to track created and modified timestamps."""
@@ -23,16 +26,9 @@ class BaseModel(models.Model):
     modified = models.DateTimeField(auto_now=True)
 
 
-class LuckyNumberManager(models.Manager):
-    """Manager for the lucky number model."""
-
-    def get_by_natural_key(self, number):
-        return self.get(number=number)
-
-
 @python_2_unicode_compatible
 class LuckyNumber(BaseModel):
-    """Unique lucky numbers from the fortune cookies."""
+    """Unique lucky numbers from fortune cookies."""
 
     class Meta:
         ordering = ['number']
@@ -45,7 +41,7 @@ class LuckyNumber(BaseModel):
     )
 
     def __str__(self):
-        return u'%d' % self.number
+        return u'{}'.format(self.number)
 
     def __int__(self):
         return self.number
@@ -55,14 +51,9 @@ class LuckyNumber(BaseModel):
 
     @property
     def occurrences(self):
+        if hasattr(self, 'fortune_cookies__count'):
+            return self.fortune_cookies__count
         return self.fortune_cookies.count()
-
-
-class ChineseWordManager(models.Manager):
-    """Manager for the Chinese word model."""
-
-    def get_by_natural_key(self, english_word, pinyin_word):
-        return self.get(english_word=english_word, pinyin_word=pinyin_word)
 
 
 @python_2_unicode_compatible
@@ -94,18 +85,20 @@ class ChineseWord(BaseModel):
 
     def __str__(self):
         if self.pinyin_word and self.chinese_word:
-            return u'%s: %s (%s)' % (self.english_word, self.chinese_word,
-                                     self.pinyin_word)
+            return u'{}: {} ({})'.format(self.english_word, self.chinese_word,
+                                         self.pinyin_word)
         elif self.chinese_word:
-            return u'%s: %s' % (self.english_word, self.chinese_word)
+            return u'{}: {}'.format(self.english_word, self.chinese_word)
         else:
-            return u'%s: %s' % (self.english_word, self.pinyin_word or '?')
+            return u'{}: {}'.format(self.english_word, self.pinyin_word or '?')
 
     def natural_key(self):
         return (self.english_word, self.pinyin_word)
 
     @property
     def occurrences(self):
+        if hasattr(self, 'fortune_cookies__count'):
+            return self.fortune_cookies__count
         return self.fortune_cookies.count()
 
 
@@ -163,7 +156,7 @@ class FortuneCookie(BaseModel):
     lucky_numbers_display.short_description = 'Lucky numbers'
 
     def __str__(self):
-        if self.lucky_numbers.count():
-            return u'%s (%s)' % (self.fortune, self.lucky_numbers_display())
+        if self.lucky_numbers.exists():
+            return u'{} ({})'.format(self.fortune, self.lucky_numbers_display())
         else:
             return self.fortune

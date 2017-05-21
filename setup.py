@@ -30,13 +30,16 @@ setup(
     zip_safe=False,
     install_requires=[
         'django',
-        'django-sortedm2m>=0.4.0',
+        'django-sortedm2m==1.3.4.dev1',
         'six',
     ],
-    tests_required=[],
     setup_requires=[],
+    dependency_links=[
+        # django-sortedm2m - Use branch to support Django 1.11
+        'https://github.com/ninemoreminutes/django-sortedm2m/archive/django-1.11.zip#egg=django-sortedm2m-1.3.4.dev1',
+    ],
     classifiers=[
-        'Development Status :: 3 - Alpha',
+        'Development Status :: 4 - Beta',
         'Environment :: Web Environment',
         'Framework :: Django',
         'Framework :: Django :: 1.8',
