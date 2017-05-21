@@ -12,9 +12,12 @@ It is tested against:
  * Django 1.9 (Python 2.7, 3.4 and 3.5)
  * Django 1.10 (Python 2.7, 3.4 and 3.5)
  * Django 1.11 (Python 2.7, 3.4, 3.5 and 3.6)
+ * Django master/2.0 (Python 3.5 and 3.6)
 
-It is not tested with Django master/2.0 using Python 3.5 and 3.6, since
-django-sortedm2m doesn't yet work with Django 2.0.
+It requires a patched version of django-sortedm2m from GitHub to support Django
+1.11 and later. Install django-fortunecookie using::
+
+  pip install --process-dependency-links django-fortunecookie
 
 .. |Build Status| image:: http://img.shields.io/travis/ninemoreminutes/django-fortunecookie.svg
    :target: https://travis-ci.org/ninemoreminutes/django-fortunecookie
