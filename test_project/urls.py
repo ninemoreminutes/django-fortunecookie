@@ -25,7 +25,7 @@ if 'django.contrib.admin' in settings.INSTALLED_APPS:
     from django.contrib import admin
     admin.autodiscover()
     urlpatterns += [
-        url(r'^admin/', include(admin.site.urls)),
+        url(r'^admin/', admin.site.urls),
     ]
 
 if 'django.contrib.staticfiles' in settings.INSTALLED_APPS and settings.DEBUG:

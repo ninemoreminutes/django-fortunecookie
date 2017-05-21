@@ -113,6 +113,8 @@ def test_protected_delete(chinese_word_model, fortune_cookie_model):
 def test_lucky_numbers_admin(admin_client, lucky_number_model, default_fortune_cookies):
     url = reverse('admin:fortunecookie_luckynumber_changelist')
     assert admin_client.get(url).status_code == 200
+    url = '{}?fortune_cookies__count=0'.format(url)
+    assert admin_client.get(url).status_code == 200
     lucky_number_data = lucky_number_model.objects.values('pk', 'number')[0]
     url = reverse('admin:fortunecookie_luckynumber_change', args=(lucky_number_data['pk'],))
     assert admin_client.get(url).status_code == 200
@@ -132,6 +134,8 @@ def test_lucky_numbers_admin(admin_client, lucky_number_model, default_fortune_c
 def test_chinese_words_admin(admin_client, chinese_word_model, fortune_cookie_model, default_fortune_cookies):
     fortune_cookie_model.objects.all().delete()  # So we don't run into the protected issue when testing delete.
     url = reverse('admin:fortunecookie_chineseword_changelist')
+    assert admin_client.get(url).status_code == 200
+    url = '{}?fortune_cookies__count=1'.format(url)
     assert admin_client.get(url).status_code == 200
     chinese_word_data = chinese_word_model.objects.values('pk', 'english_word', 'pinyin_word', 'chinese_word')[0]
     url = reverse('admin:fortunecookie_chineseword_change', args=(chinese_word_data['pk'],))
@@ -159,7 +163,6 @@ def test_fortune_cookies_admin(admin_client, chinese_word_model, fortune_cookie_
     assert admin_client.get(url).status_code == 200
     fortune_cookie_data = fortune_cookie_model.objects.filter(chinese_word__isnull=False, lucky_numbers__pk__isnull=False).values('pk', 'fortune', 'chinese_word_id')[0]
     fortune_cookie_data['lucky_numbers'] = list(fortune_cookie_model.objects.get(pk=fortune_cookie_data['pk']).lucky_numbers.values_list('number', flat=True))
-    print fortune_cookie_data
     url = reverse('admin:fortunecookie_fortunecookie_change', args=(fortune_cookie_data['pk'],))
     assert admin_client.get(url).status_code == 200
     updated_fortune_cookie_data = dict(fortune_cookie_data.items())
