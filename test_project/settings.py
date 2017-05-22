@@ -24,15 +24,29 @@ DATABASES = {
     }
 }
 
+
+import dj_database_url
+
+db_from_env = dj_database_url.config(conn_max_age=500)
+DATABASES['default'].update(db_from_env)
+
 SITE_ID = 1
 
 SECRET_KEY = '1a93a98e-03e7-4787-b099-0209705b80aa'
 
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
+ALLOWED_HOSTS = ['*']
+
 STATIC_URL = '/static/'
+
+STATIC_ROOT = os.path.join(PROJECT_ROOT, 'public', 'static')
 
 STATICFILES_DIRS = [
     os.path.join(PROJECT_ROOT, 'static'),
 ]
+
+STATICFILES_STORAGE = 'whitenoise.django.GzipManifestStaticFilesStorage'
 
 if django.VERSION >= (1, 10):
     MIDDLEWARE = [
@@ -90,6 +104,8 @@ INSTALLED_APPS = (
     'test_project.test_app',
 )
 
+WSGI_APPLICATION = 'test_project.wsgi.application'
+
 INTERNAL_IPS = ('127.0.0.1',)
 
 try:
@@ -107,5 +123,3 @@ except ImportError:
 
 RUNSERVER_DEFAULT_ADDR = '127.0.0.1'
 RUNSERVER_DEFAULT_PORT = '8066'
-
-EXCLUDED_TEST_APPS = [x for x in INSTALLED_APPS if x != 'fortunecookie']

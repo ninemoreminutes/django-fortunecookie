@@ -1,7 +1,12 @@
 django
 django-debug-toolbar
+dj-database-url
 # django-sortedm2m - Use branch to support Django 1.11
 -e git+https://github.com/ninemoreminutes/django-sortedm2m.git@django-1.11#egg=django-sortedm2m==1.3.4.dev1
+gunicorn
 ipython
+psycopg2
+six
 sphinx
 tox
+whitenoise
