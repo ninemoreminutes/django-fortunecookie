@@ -1,0 +1,13 @@
+*.pyc
+*.pyo
+*.egg
+*.egg-info
+/build
+/dist
+/coverage.xml
+/pep8.txt
+/.tox
+/.cache
+/.coverage
+/reports
+__pycache__
