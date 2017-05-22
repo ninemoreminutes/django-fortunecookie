@@ -30,6 +30,10 @@ SECRET_KEY = '1a93a98e-03e7-4787-b099-0209705b80aa'
 
 STATIC_URL = '/static/'
 
+STATICFILES_DIRS = [
+    os.path.join(PROJECT_ROOT, 'static'),
+]
+
 if django.VERSION >= (1, 10):
     MIDDLEWARE = [
         'django.middleware.security.SecurityMiddleware',
