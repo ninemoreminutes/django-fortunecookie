@@ -66,6 +66,20 @@ h1.refresh a:hover, h1.refresh a:focus,
 div.fortune-cookie a:hover, div.fortune-cookie a:focus {
   color: #fff;
 }
+.outbed {
+  position: relative;
+}
+.inbed {
+  position: absolute;
+  display: inline-block;
+  white-space: nowrap;
+  transition: opacity .25s ease-in-out;
+  opacity: 0.01;
+  z-index: 100;
+}
+.inbed:hover {
+  opacity: 0.6;
+}
 </style>
 {% endblock %}
 
@@ -107,7 +121,7 @@ $(function() {
     </ol>
     <div class="carousel-inner" role="listbox">
       <div class="item active">
-        <h1 class="fortune">{{ object.fortune }}</h1>
+        <h1 class="fortune">{{ object.fortune }}<span class="outbed"><span class="inbed text-left">...{% trans 'in bed' %}.</span></span></h1>
       </div>
       {% if object.lucky_numbers.exists %}
         <div class="item">
