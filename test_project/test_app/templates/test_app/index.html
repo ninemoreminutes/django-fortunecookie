@@ -51,18 +51,20 @@ span.lucky-number {
   width: 22px;
   height: 22px;
 }
-h1.refresh {
+h1.refresh, h1.nofortune {
   font-size: 60px;
   margin-top: 60px;
 }
-h1.refresh, div.fortune-cookie a {
+h1.refresh, h1.nofortune, div.fortune-cookie a {
   text-shadow: 5px 5px 5px rgba(0,0,0,0.75);
 }
 h1.refresh a,
+h1.nofortune a,
 div.fortune-cookie a {
   color: #ddd;
 }
 h1.refresh a:hover, h1.refresh a:focus,
+h1.nofortune a:hover, h1.nofortune a:focus,
 div.fortune-cookie a:hover, div.fortune-cookie a:focus {
   color: #fff;
 }
@@ -102,54 +104,63 @@ $(function() {
 {% block mainclass %}container{% endblock %}
 
 {% block content %}
-<div class="fortune-cookie text-center" style="display: none;">
-  <a href="#">
-    <img class="img-responsive center-block" src="{% static 'img/fortunecookie.png' %}">
-    <h4 class="text-center">{% trans 'Click to reveal your fortune' %}</h4>
-  </a>
-</div>
-<div class="jumbotron clearfix text-center" style="display: none;">
-  <div id="fortune-carousel" class="carousel slide" data-interval="false">
-    <ol class="carousel-indicators">
-      <li data-target="#fortune-carousel" data-slide-to="0" class="active"></li>
-      {% if object.lucky_numbers.exists or object.chinese_word %}
-      <li data-target="#fortune-carousel" data-slide-to="1"></li>
-      {% if object.lucky_numbers.exists and object.chinese_word %}
-      <li data-target="#fortune-carousel" data-slide-to="2"></li>
-      {% endif %}
-      {% endif %}
-    </ol>
-    <div class="carousel-inner" role="listbox">
-      <div class="item active">
-        <h1 class="fortune">{{ object.fortune }}<span class="outbed"><span class="inbed text-left">...{% trans 'in bed' %}.</span></span></h1>
-      </div>
-      {% if object.lucky_numbers.exists %}
-        <div class="item">
-          <h3 class="lucky-numbers">{% trans 'Lucky Numbers' %}</h3>
-          <h2 class="lucky-numbers">{% for ln in object.lucky_numbers.all %}<span class="lucky-number">{{ ln }}</span> {% endfor %}</h2>
-        </div>
-      {% endif %}
-      {% if object.chinese_word %}
-        <div class="item">
-          <h3 class="chinese-word">{% trans 'Learn Chinese' %}</h3>
-          <h2 class="chinese-word">{{ object.chinese_word }}</h2>
-        </div>
-      {% endif %}
-    </div>
-    <a class="left carousel-control" href="#fortune-carousel" role="button" data-slide="prev">
-      <span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
-      <span class="sr-only">{% trans 'Previous' %}</span>
-    </a>
-    <a class="right carousel-control" href="#fortune-carousel" role="button" data-slide="next">
-      <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
-      <span class="sr-only">{% trans 'Next' %}</span>
+{% if object %}
+  <div class="fortune-cookie text-center" style="display: none;">
+    <a href="#">
+      <img class="img-responsive center-block" src="{% static 'img/fortunecookie.png' %}">
+      <h4 class="text-center">{% trans 'Click to reveal your fortune' %}</h4>
     </a>
   </div>
-</div>
-<h1 class="text-center refresh" style="display: none;">
-  <a href="{{ request.path }}">
-    <span class="glyphicon glyphicon-refresh" aria-hidden="true"></span>
-    <h5 class="text-center">{% trans 'Load a new fortune' %}</h5>
-  </a>
-</h1>
+  <div class="jumbotron clearfix text-center" style="display: none;">
+    <div id="fortune-carousel" class="carousel slide" data-interval="false">
+      <ol class="carousel-indicators">
+        <li data-target="#fortune-carousel" data-slide-to="0" class="active"></li>
+        {% if object.lucky_numbers.exists or object.chinese_word %}
+        <li data-target="#fortune-carousel" data-slide-to="1"></li>
+        {% if object.lucky_numbers.exists and object.chinese_word %}
+        <li data-target="#fortune-carousel" data-slide-to="2"></li>
+        {% endif %}
+        {% endif %}
+      </ol>
+      <div class="carousel-inner" role="listbox">
+        <div class="item active">
+          <h1 class="fortune">{{ object.fortune }}<span class="outbed"><span class="inbed text-left">...{% trans 'in bed' %}.</span></span></h1>
+        </div>
+        {% if object.lucky_numbers.exists %}
+          <div class="item">
+            <h3 class="lucky-numbers">{% trans 'Lucky Numbers' %}</h3>
+            <h2 class="lucky-numbers">{% for ln in object.lucky_numbers.all %}<span class="lucky-number">{{ ln }}</span> {% endfor %}</h2>
+          </div>
+        {% endif %}
+        {% if object.chinese_word %}
+          <div class="item">
+            <h3 class="chinese-word">{% trans 'Learn Chinese' %}</h3>
+            <h2 class="chinese-word">{{ object.chinese_word }}</h2>
+          </div>
+        {% endif %}
+      </div>
+      <a class="left carousel-control" href="#fortune-carousel" role="button" data-slide="prev">
+        <span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
+        <span class="sr-only">{% trans 'Previous' %}</span>
+      </a>
+      <a class="right carousel-control" href="#fortune-carousel" role="button" data-slide="next">
+        <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
+        <span class="sr-only">{% trans 'Next' %}</span>
+      </a>
+    </div>
+  </div>
+  <h1 class="text-center refresh" style="display: none;">
+    <a href="{{ request.path }}">
+      <span class="glyphicon glyphicon-refresh" aria-hidden="true"></span>
+      <h5 class="text-center">{% trans 'Load a new fortune' %}</h5>
+    </a>
+  </h1>
+{% else %}
+  <h1 class="text-center nofortune">
+    <a href="{{ request.path }}">
+      <span class="glyphicon glyphicon-flash" aria-hidden="true"></span>
+      <h5 class="text-center">{% trans 'No fortunes available yet' %}</h5>
+    </a>
+  </h1>
+{% endif %}
 {% endblock content %}
