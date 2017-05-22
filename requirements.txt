@@ -1,1 +1,2 @@
--r ./requirements/dev.txt -r ./requirements/test.txt
+-r ./requirements/dev.txt
+-r ./requirements/test.txt
