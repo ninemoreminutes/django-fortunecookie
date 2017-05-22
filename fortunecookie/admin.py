@@ -31,6 +31,21 @@ class OccurrencesListFilter(admin.SimpleListFilter):
             return queryset.filter(fortune_cookies__count=self.value())
 
 
+class LuckyNumberListFilter(admin.SimpleListFilter):
+    """Filter fortune cookie list by lucky number."""
+
+    title = _('lucky number')
+
+    def lookups(self, request, model_admin):
+        qs = model_admin.get_queryset(request)
+        occurrences = set(qs.values_list('lucky_numbers__number', flat=True))
+        return [(x, six.text_type(x)) for x in sorted(occurrences)]
+
+    def queryset(self, request, queryset):
+        if self.value() is not None:
+            return queryset.filter(lucky_numbers__number=self.value())
+
+
 class OccurrencesMixin(object):
     """Mixin to annotate queries with count of fortune cookies."""
 
@@ -81,7 +96,7 @@ class FortuneCookieAdmin(admin.ModelAdmin):
 
     list_display = ('fortune', 'get_chinese_word_display',
                     'get_lucky_numbers_display', 'created', 'modified')
-    list_filter = ('chinese_word', 'lucky_numbers')
+    list_filter = ('chinese_word', LuckyNumberListFilter)
     fields = ('fortune', 'chinese_word', 'lucky_numbers', 'created', 'modified')
     readonly_fields = ('created', 'modified')
 
