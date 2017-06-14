@@ -50,7 +50,11 @@ STATICFILES_DIRS = [
     os.path.join(PROJECT_ROOT, 'static'),
 ]
 
-STATICFILES_STORAGE = 'whitenoise.django.GzipManifestStaticFilesStorage'
+try:
+    import whitenoise  # noqa
+    STATICFILES_STORAGE = 'whitenoise.django.GzipManifestStaticFilesStorage'
+except ImportError:
+    pass
 
 if django.VERSION >= (1, 10):
     MIDDLEWARE = [
