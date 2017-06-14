@@ -35,6 +35,7 @@ class LuckyNumberListFilter(admin.SimpleListFilter):
     """Filter fortune cookie list by lucky number."""
 
     title = _('lucky number')
+    parameter_name = 'lucky_numbers__number'
 
     def lookups(self, request, model_admin):
         qs = model_admin.get_queryset(request)

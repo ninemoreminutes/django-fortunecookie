@@ -7,7 +7,10 @@ import django
 from django.conf import global_settings
 
 # DJ Database URL
-import dj_database_url
+try:
+    import dj_database_url
+except ImportError:
+    dj_database_url = None
 
 # Update this module's local settings from the global settings module.
 this_module = sys.modules[__name__]
@@ -27,8 +30,9 @@ DATABASES = {
     }
 }
 
-db_from_env = dj_database_url.config(conn_max_age=500)
-DATABASES['default'].update(db_from_env)
+if dj_database_url:
+    db_from_env = dj_database_url.config(conn_max_age=500)
+    DATABASES['default'].update(db_from_env)
 
 SITE_ID = 1
 

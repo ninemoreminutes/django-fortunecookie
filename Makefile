@@ -40,7 +40,7 @@ flake8: reports requirements
 check8: pep8 flake8
 
 test: clean-pyc
-	python setup.py test
+	py.test -v
 
 clean-tox:
 	rm -rf .tox
