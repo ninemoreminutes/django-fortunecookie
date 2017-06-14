@@ -23,7 +23,7 @@ class OccurrencesListFilter(admin.SimpleListFilter):
 
     def lookups(self, request, model_admin):
         qs = model_admin.get_queryset(request)
-        occurrences = set(qs.values_list(self.parameter_name, flat=True))
+        occurrences = set(filter(None, qs.values_list(self.parameter_name, flat=True)))
         return [(x, six.text_type(x)) for x in sorted(occurrences)]
 
     def queryset(self, request, queryset):
@@ -39,7 +39,7 @@ class LuckyNumberListFilter(admin.SimpleListFilter):
 
     def lookups(self, request, model_admin):
         qs = model_admin.get_queryset(request)
-        occurrences = set(qs.values_list('lucky_numbers__number', flat=True))
+        occurrences = set(filter(None, qs.values_list(self.parameter_name, flat=True)))
         return [(x, six.text_type(x)) for x in sorted(occurrences)]
 
     def queryset(self, request, queryset):
