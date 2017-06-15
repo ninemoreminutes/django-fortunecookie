@@ -40,6 +40,7 @@ flake8: reports requirements
 check8: pep8 flake8
 
 test: clean-pyc
+	coverage erase
 	py.test -v
 
 clean-tox:
@@ -48,8 +49,12 @@ clean-tox:
 tox: clean-pyc
 	tox
 
+detox: clean-pyc
+	detox
+
 clean-all: clean-pyc clean-tox
 	rm -rf *.egg-info .eggs .cache .coverage build reports
 
 ship-it: clean-pyc
-	python setup.py release_build register upload upload_docs
+	# python setup.py release_build register upload upload_docs
+	python setup.py release_build upload

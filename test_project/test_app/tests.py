@@ -161,6 +161,9 @@ def test_fortune_cookies_admin(admin_client, chinese_word_model, fortune_cookie_
     fortune_cookie_model.objects.filter(chinese_word__isnull=True).first().lucky_numbers.clear()
     url = reverse('admin:fortunecookie_fortunecookie_changelist')
     assert admin_client.get(url).status_code == 200
+    lucky_number = fortune_cookie_model.objects.filter(lucky_numbers__pk__isnull=False).first().lucky_numbers.first().pk
+    url = '{}?lucky_numbers__number={}'.format(url, lucky_number)
+    assert admin_client.get(url).status_code == 200
     fortune_cookie_data = fortune_cookie_model.objects.filter(chinese_word__isnull=False, lucky_numbers__pk__isnull=False).values('pk', 'fortune', 'chinese_word_id')[0]
     fortune_cookie_data['lucky_numbers'] = list(fortune_cookie_model.objects.get(pk=fortune_cookie_data['pk']).lucky_numbers.values_list('number', flat=True))
     url = reverse('admin:fortunecookie_fortunecookie_change', args=(fortune_cookie_data['pk'],))
