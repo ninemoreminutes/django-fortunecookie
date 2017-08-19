@@ -6,10 +6,10 @@
 #
 configparser==3.5.0       # via flake8
 coverage==4.4.1           # via pytest-cov
-django-extensions==1.7.9
+django-extensions==1.8.1
 djangorestframework==3.6.3
 enum34==1.1.6             # via flake8
-flake8==3.3.0
+flake8==3.4.1
 mccabe==0.6.1             # via flake8
 pep8==1.7.0
 py==1.4.34                # via pytest
@@ -19,5 +19,5 @@ pytest-cov==2.5.1
 pytest-django==3.1.2
 pytest-flake8==0.8.1
 pytest-runner==2.11.1
-pytest==3.1.2
+pytest==3.2.1
 six==1.10.0               # via django-extensions
